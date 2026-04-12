@@ -31,3 +31,6 @@ bin/
 
 ### modules ###
 node_modules/
+
+### Java build artifacts ###
+*.class

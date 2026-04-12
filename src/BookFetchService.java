@@ -1,72 +1,34 @@
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
+import java.sql.Statement;
 
 public class BookFetchService {
 
-    public String fetchBooks() {
-        String sql = "select * from book_details";
+    public static String fetchBooksJson() throws Exception {
+        StringBuilder json = new StringBuilder("[");
 
-        StringBuilder json = new StringBuilder();
-        json.append("[");
+        Connection con = DBConnection.getConnection();
+        Statement stmt = con.createStatement();
+        ResultSet rs = stmt.executeQuery("select * from book_details");
 
-        try (Connection con = DBConnection.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-
-            ResultSetMetaData metaData = rs.getMetaData();
-            int columnCount = metaData.getColumnCount();
-            boolean firstRow = true;
-
-            while (rs.next()) {
-                if (!firstRow) {
-                    json.append(",");
-                }
-                firstRow = false;
-
-                json.append("{");
-
-                for (int i = 1; i <= columnCount; i++) {
-                    if (i > 1) {
-                        json.append(",");
-                    }
-
-                    String columnName = metaData.getColumnName(i);
-                    String value = rs.getString(i);
-
-                    json.append("\"")
-                            .append(escapeJson(columnName))
-                            .append("\":");
-
-                    if (value == null) {
-                        json.append("null");
-                    } else {
-                        json.append("\"")
-                                .append(escapeJson(value))
-                                .append("\"");
-                    }
-                }
-
-                json.append("}");
-            }
-
-            json.append("]");
-            return json.toString();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return "[]";
-        }
-    }
-
-    private String escapeJson(String text) {
-        if (text == null) {
-            return "";
+        while (rs.next()) {
+            json.append("{")
+                    .append("\"id\":").append(rs.getInt("id")).append(",")
+                    .append("\"name\":\"").append(rs.getString("name")).append("\",")
+                    .append("\"type\":\"").append(rs.getString("type")).append("\",")
+                    .append("\"available\":").append(rs.getBoolean("available"))
+                    .append("},");
         }
 
-        return text.replace("\\", "\\\\")
-                .replace("\"", "\\\"");
+        if (json.length() > 1) {
+            json.deleteCharAt(json.length() - 1);
+        }
+
+        json.append("]");
+
+        con.close();
+
+        return json.toString();
     }
 }
+
