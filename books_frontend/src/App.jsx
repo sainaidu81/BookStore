@@ -51,19 +51,6 @@ function App() {//main
   const availableCount = books.filter(b => b.available).length;
   const notAvailableCount = books.filter(b => !b.available).length;
 
-
-  // // Pie Data - Type
-  // const typeData = {
-  //   labels: ["Fiction", "Non-Fiction"],
-  //   datasets: [
-  //     {
-  //       data: [fictionCount, nonFictionCount],
-  //       backgroundColor: ["#36A2EB", "#FF6384"]
-  //     }
-  //   ]
-  // };
-
-
   // Pie Data - Availability
   const availabilityData = {
     labels: ["Yes", "No"],
